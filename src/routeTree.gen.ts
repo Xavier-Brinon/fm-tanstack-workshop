@@ -17,7 +17,9 @@ import { Route as RscDemoIndexRouteImport } from './routes/rsc-demo/index'
 import { Route as LessonsIndexRouteImport } from './routes/lessons/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as RscDemoIdRouteImport } from './routes/rsc-demo/$id'
+import { Route as OverviewExercisesRouteRouteImport } from './routes/overview/exercises/route'
 import { Route as AppAdminRouteRouteImport } from './routes/app/admin/route'
+import { Route as OverviewExercisesIndexRouteImport } from './routes/overview/exercises/index'
 import { Route as Lessons2AIndexRouteImport } from './routes/lessons/2A/index'
 import { Route as Lessons15IndexRouteImport } from './routes/lessons/15/index'
 import { Route as AppWorkoutsIndexRouteImport } from './routes/app/workouts/index'
@@ -25,6 +27,7 @@ import { Route as AppMeasurementsIndexRouteImport } from './routes/app/measureme
 import { Route as AppLogWorkoutIndexRouteImport } from './routes/app/log-workout/index'
 import { Route as AppLogMeasurementIndexRouteImport } from './routes/app/log-measurement/index'
 import { Route as AppAdminIndexRouteImport } from './routes/app/admin/index'
+import { Route as OverviewExercisesIdRouteImport } from './routes/overview/exercises/$id'
 import { Route as AppAdminExercisesRouteImport } from './routes/app/admin/exercises'
 import { Route as AppAdminBodyCompositionRouteImport } from './routes/app/admin/body-composition'
 import { Route as Lessons5WorkoutsRouteRouteImport } from './routes/lessons/5/workouts/route'
@@ -103,10 +106,20 @@ const RscDemoIdRoute = RscDemoIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => RscDemoRouteRoute,
 } as any)
+const OverviewExercisesRouteRoute = OverviewExercisesRouteRouteImport.update({
+  id: '/overview/exercises',
+  path: '/overview/exercises',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppAdminRouteRoute = AppAdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AppRouteRoute,
+} as any)
+const OverviewExercisesIndexRoute = OverviewExercisesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OverviewExercisesRouteRoute,
 } as any)
 const Lessons2AIndexRoute = Lessons2AIndexRouteImport.update({
   id: '/2A/',
@@ -142,6 +155,11 @@ const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppAdminRouteRoute,
+} as any)
+const OverviewExercisesIdRoute = OverviewExercisesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => OverviewExercisesRouteRoute,
 } as any)
 const AppAdminExercisesRoute = AppAdminExercisesRouteImport.update({
   id: '/exercises',
@@ -344,6 +362,7 @@ export interface FileRoutesByFullPath {
   '/lessons': typeof LessonsRouteRouteWithChildren
   '/rsc-demo': typeof RscDemoRouteRouteWithChildren
   '/app/admin': typeof AppAdminRouteRouteWithChildren
+  '/overview/exercises': typeof OverviewExercisesRouteRouteWithChildren
   '/rsc-demo/$id': typeof RscDemoIdRoute
   '/app/': typeof AppIndexRoute
   '/lessons/': typeof LessonsIndexRoute
@@ -351,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/lessons/5/workouts': typeof Lessons5WorkoutsRouteRouteWithChildren
   '/app/admin/body-composition': typeof AppAdminBodyCompositionRoute
   '/app/admin/exercises': typeof AppAdminExercisesRoute
+  '/overview/exercises/$id': typeof OverviewExercisesIdRoute
   '/app/admin/': typeof AppAdminIndexRoute
   '/app/log-measurement/': typeof AppLogMeasurementIndexRoute
   '/app/log-workout/': typeof AppLogWorkoutIndexRoute
@@ -358,6 +378,7 @@ export interface FileRoutesByFullPath {
   '/app/workouts/': typeof AppWorkoutsIndexRoute
   '/lessons/15/': typeof Lessons15IndexRoute
   '/lessons/2A/': typeof Lessons2AIndexRoute
+  '/overview/exercises/': typeof OverviewExercisesIndexRoute
   '/lessons/1/workouts/$id': typeof Lessons1WorkoutsIdRoute
   '/lessons/10/workouts/$id': typeof Lessons10WorkoutsIdRoute
   '/lessons/11/workouts/$id': typeof Lessons11WorkoutsIdRoute
@@ -401,6 +422,7 @@ export interface FileRoutesByTo {
   '/rsc-demo': typeof RscDemoIndexRoute
   '/app/admin/body-composition': typeof AppAdminBodyCompositionRoute
   '/app/admin/exercises': typeof AppAdminExercisesRoute
+  '/overview/exercises/$id': typeof OverviewExercisesIdRoute
   '/app/admin': typeof AppAdminIndexRoute
   '/app/log-measurement': typeof AppLogMeasurementIndexRoute
   '/app/log-workout': typeof AppLogWorkoutIndexRoute
@@ -408,6 +430,7 @@ export interface FileRoutesByTo {
   '/app/workouts': typeof AppWorkoutsIndexRoute
   '/lessons/15': typeof Lessons15IndexRoute
   '/lessons/2A': typeof Lessons2AIndexRoute
+  '/overview/exercises': typeof OverviewExercisesIndexRoute
   '/lessons/1/workouts/$id': typeof Lessons1WorkoutsIdRoute
   '/lessons/10/workouts/$id': typeof Lessons10WorkoutsIdRoute
   '/lessons/11/workouts/$id': typeof Lessons11WorkoutsIdRoute
@@ -450,6 +473,7 @@ export interface FileRoutesById {
   '/lessons': typeof LessonsRouteRouteWithChildren
   '/rsc-demo': typeof RscDemoRouteRouteWithChildren
   '/app/admin': typeof AppAdminRouteRouteWithChildren
+  '/overview/exercises': typeof OverviewExercisesRouteRouteWithChildren
   '/rsc-demo/$id': typeof RscDemoIdRoute
   '/app/': typeof AppIndexRoute
   '/lessons/': typeof LessonsIndexRoute
@@ -457,6 +481,7 @@ export interface FileRoutesById {
   '/lessons/5/workouts': typeof Lessons5WorkoutsRouteRouteWithChildren
   '/app/admin/body-composition': typeof AppAdminBodyCompositionRoute
   '/app/admin/exercises': typeof AppAdminExercisesRoute
+  '/overview/exercises/$id': typeof OverviewExercisesIdRoute
   '/app/admin/': typeof AppAdminIndexRoute
   '/app/log-measurement/': typeof AppLogMeasurementIndexRoute
   '/app/log-workout/': typeof AppLogWorkoutIndexRoute
@@ -464,6 +489,7 @@ export interface FileRoutesById {
   '/app/workouts/': typeof AppWorkoutsIndexRoute
   '/lessons/15/': typeof Lessons15IndexRoute
   '/lessons/2A/': typeof Lessons2AIndexRoute
+  '/overview/exercises/': typeof OverviewExercisesIndexRoute
   '/lessons/1/workouts/$id': typeof Lessons1WorkoutsIdRoute
   '/lessons/10/workouts/$id': typeof Lessons10WorkoutsIdRoute
   '/lessons/11/workouts/$id': typeof Lessons11WorkoutsIdRoute
@@ -507,6 +533,7 @@ export interface FileRouteTypes {
     | '/lessons'
     | '/rsc-demo'
     | '/app/admin'
+    | '/overview/exercises'
     | '/rsc-demo/$id'
     | '/app/'
     | '/lessons/'
@@ -514,6 +541,7 @@ export interface FileRouteTypes {
     | '/lessons/5/workouts'
     | '/app/admin/body-composition'
     | '/app/admin/exercises'
+    | '/overview/exercises/$id'
     | '/app/admin/'
     | '/app/log-measurement/'
     | '/app/log-workout/'
@@ -521,6 +549,7 @@ export interface FileRouteTypes {
     | '/app/workouts/'
     | '/lessons/15/'
     | '/lessons/2A/'
+    | '/overview/exercises/'
     | '/lessons/1/workouts/$id'
     | '/lessons/10/workouts/$id'
     | '/lessons/11/workouts/$id'
@@ -564,6 +593,7 @@ export interface FileRouteTypes {
     | '/rsc-demo'
     | '/app/admin/body-composition'
     | '/app/admin/exercises'
+    | '/overview/exercises/$id'
     | '/app/admin'
     | '/app/log-measurement'
     | '/app/log-workout'
@@ -571,6 +601,7 @@ export interface FileRouteTypes {
     | '/app/workouts'
     | '/lessons/15'
     | '/lessons/2A'
+    | '/overview/exercises'
     | '/lessons/1/workouts/$id'
     | '/lessons/10/workouts/$id'
     | '/lessons/11/workouts/$id'
@@ -612,6 +643,7 @@ export interface FileRouteTypes {
     | '/lessons'
     | '/rsc-demo'
     | '/app/admin'
+    | '/overview/exercises'
     | '/rsc-demo/$id'
     | '/app/'
     | '/lessons/'
@@ -619,6 +651,7 @@ export interface FileRouteTypes {
     | '/lessons/5/workouts'
     | '/app/admin/body-composition'
     | '/app/admin/exercises'
+    | '/overview/exercises/$id'
     | '/app/admin/'
     | '/app/log-measurement/'
     | '/app/log-workout/'
@@ -626,6 +659,7 @@ export interface FileRouteTypes {
     | '/app/workouts/'
     | '/lessons/15/'
     | '/lessons/2A/'
+    | '/overview/exercises/'
     | '/lessons/1/workouts/$id'
     | '/lessons/10/workouts/$id'
     | '/lessons/11/workouts/$id'
@@ -667,6 +701,7 @@ export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
   LessonsRouteRoute: typeof LessonsRouteRouteWithChildren
   RscDemoRouteRoute: typeof RscDemoRouteRouteWithChildren
+  OverviewExercisesRouteRoute: typeof OverviewExercisesRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -727,12 +762,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RscDemoIdRouteImport
       parentRoute: typeof RscDemoRouteRoute
     }
+    '/overview/exercises': {
+      id: '/overview/exercises'
+      path: '/overview/exercises'
+      fullPath: '/overview/exercises'
+      preLoaderRoute: typeof OverviewExercisesRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/admin': {
       id: '/app/admin'
       path: '/admin'
       fullPath: '/app/admin'
       preLoaderRoute: typeof AppAdminRouteRouteImport
       parentRoute: typeof AppRouteRoute
+    }
+    '/overview/exercises/': {
+      id: '/overview/exercises/'
+      path: '/'
+      fullPath: '/overview/exercises/'
+      preLoaderRoute: typeof OverviewExercisesIndexRouteImport
+      parentRoute: typeof OverviewExercisesRouteRoute
     }
     '/lessons/2A/': {
       id: '/lessons/2A/'
@@ -782,6 +831,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/admin/'
       preLoaderRoute: typeof AppAdminIndexRouteImport
       parentRoute: typeof AppAdminRouteRoute
+    }
+    '/overview/exercises/$id': {
+      id: '/overview/exercises/$id'
+      path: '/$id'
+      fullPath: '/overview/exercises/$id'
+      preLoaderRoute: typeof OverviewExercisesIdRouteImport
+      parentRoute: typeof OverviewExercisesRouteRoute
     }
     '/app/admin/exercises': {
       id: '/app/admin/exercises'
@@ -1197,11 +1253,28 @@ const RscDemoRouteRouteWithChildren = RscDemoRouteRoute._addFileChildren(
   RscDemoRouteRouteChildren,
 )
 
+interface OverviewExercisesRouteRouteChildren {
+  OverviewExercisesIdRoute: typeof OverviewExercisesIdRoute
+  OverviewExercisesIndexRoute: typeof OverviewExercisesIndexRoute
+}
+
+const OverviewExercisesRouteRouteChildren: OverviewExercisesRouteRouteChildren =
+  {
+    OverviewExercisesIdRoute: OverviewExercisesIdRoute,
+    OverviewExercisesIndexRoute: OverviewExercisesIndexRoute,
+  }
+
+const OverviewExercisesRouteRouteWithChildren =
+  OverviewExercisesRouteRoute._addFileChildren(
+    OverviewExercisesRouteRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRouteRoute: AppRouteRouteWithChildren,
   LessonsRouteRoute: LessonsRouteRouteWithChildren,
   RscDemoRouteRoute: RscDemoRouteRouteWithChildren,
+  OverviewExercisesRouteRoute: OverviewExercisesRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
