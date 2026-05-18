@@ -5,7 +5,6 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { getDb } from "@/data/db";
 import { users as usersTable } from "@/drizzle/schema";
-import { getExercisesServerFn } from "@/server-functions/exercises";
 import { RscLayout } from "@/components/rsc-layout/layout";
 import type { FC, PropsWithChildren } from "react";
 
@@ -17,14 +16,9 @@ import {
 const getLayout = createServerFn({
   method: "GET",
 }).handler(async () => {
-  return createCompositeComponent(
-    (
-      props: PropsWithChildren<{
-        HeaderContent: FC<{ name: string; avatar: string }>;
-        Foo: any;
-      }>,
-    ) => <RscLayout>{props.children}</RscLayout>,
-  );
+  return createCompositeComponent((props: PropsWithChildren) => (
+    <RscLayout>{props.children}</RscLayout>
+  ));
 });
 
 export const getUserServerFn = createServerFn({ method: "GET" }).handler(
@@ -41,7 +35,11 @@ export const getUserServerFn = createServerFn({ method: "GET" }).handler(
 
 export const Route = createFileRoute("/rsc-demo")({
   component: RouteComponent,
-  loader: async () => {},
+  loader: async () => {
+    const layout = await getLayout();
+
+    return { layout };
+  },
   pendingComponent: () => <div>Loading...</div>,
   pendingMs: 0,
   gcTime: 1000 * 60 * 5,
@@ -49,11 +47,12 @@ export const Route = createFileRoute("/rsc-demo")({
 });
 
 function RouteComponent() {
+  const { layout } = Route.useLoaderData();
   return (
-    <RscLayout>
+    <CompositeComponent src={layout}>
       <div className="mx-auto w-full max-w-xl rounded-xl border border-slate-200 p-6 shadow-sm">
         <Outlet />
       </div>
-    </RscLayout>
+    </CompositeComponent>
   );
 }
