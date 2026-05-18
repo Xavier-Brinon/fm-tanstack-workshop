@@ -3,7 +3,7 @@ import {
   exercises as exercisesTable,
   muscleGroup as muscleGroupsTable,
 } from "@/drizzle/schema";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
 import { DisplayExercise } from "./-display-exercise";
@@ -45,5 +45,12 @@ export const Route = createFileRoute("/overview/exercises/$id")({
 function RouteComponent() {
   const { exercise, muscleGroups } = Route.useLoaderData();
 
-  return <DisplayExercise exercise={exercise} muscleGroups={muscleGroups} />;
+  return (
+    <div className="flex flex-col gap-4">
+      <DisplayExercise exercise={exercise} muscleGroups={muscleGroups} />
+      <Link to="/overview/exercises" className="underline">
+        Back
+      </Link>
+    </div>
+  );
 }
