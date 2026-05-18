@@ -9,7 +9,10 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { editExercise } from "@/server-functions/exercises";
+import {
+  editExercise,
+  getExercisesServerFn,
+} from "@/server-functions/exercises";
 import { mutateWorkoutName } from "@/server-functions/in-class/mutate-workout-name";
 import {
   getInClassWorkoutHistoryServerFn,
@@ -24,12 +27,17 @@ type InClassExercise = {
 export const Route = createFileRoute("/rsc-demo/")({
   component: RouteComponent,
   loader: async () => {
-    const workoutsPayload = await getInClassWorkoutHistoryServerFn({
+    const workoutsPayload = getInClassWorkoutHistoryServerFn({
       data: { operation: "load-workouts" },
     });
 
+    const exercises = getExercisesServerFn({
+      data: { operation: "load-exercises" },
+    });
+
     return {
-      workouts: workoutsPayload.workouts,
+      workouts: (await workoutsPayload).workouts,
+      exercises: await exercises,
     };
   },
   pendingComponent: () => <div>Loading...</div>,
@@ -39,15 +47,11 @@ export const Route = createFileRoute("/rsc-demo/")({
 });
 
 function RouteComponent() {
-  const { workouts } = Route.useLoaderData();
+  const { workouts, exercises } = Route.useLoaderData();
   const { isFetching } = Route.useMatch();
 
   const layoutRoute = getRouteApi("/rsc-demo/");
   const { isFetching: isLayoutFetching } = layoutRoute.useMatch();
-
-  const { exercises } = useLoaderData({
-    from: "/rsc-demo",
-  });
 
   const exerciseLookup = useMemo(() => {
     return new Map(exercises.map(exercise => [exercise.id, exercise]));

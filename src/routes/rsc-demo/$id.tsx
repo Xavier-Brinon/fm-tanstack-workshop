@@ -3,16 +3,22 @@ import { createFileRoute, getRouteApi, Link } from "@tanstack/react-router";
 import { getInClassWorkoutById } from "@/server-functions/in-class/workouts-simple";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { getExercisesServerFn } from "@/server-functions/exercises";
 
 export const Route = createFileRoute("/rsc-demo/$id")({
   component: RouteComponent,
   loader: async ({ params }) => {
-    const workout = await getInClassWorkoutById({
+    const workout = getInClassWorkoutById({
       data: { id: Number(params.id) },
     });
 
+    const exercises = getExercisesServerFn({
+      data: { operation: "load-exercises" },
+    });
+
     return {
-      workout: workout!,
+      workout: (await workout)!,
+      exercises: await exercises,
     };
   },
   pendingComponent: () => <div>Loading...</div>,
@@ -22,11 +28,10 @@ export const Route = createFileRoute("/rsc-demo/$id")({
 });
 
 function RouteComponent() {
-  const { workout } = Route.useLoaderData();
+  const { workout, exercises } = Route.useLoaderData();
   const { isFetching } = Route.useMatch();
 
   const routeApi = getRouteApi("/rsc-demo");
-  const { exercises } = routeApi.useLoaderData();
 
   const exerciseLookup = useMemo(() => {
     return new Map(exercises.map(exercise => [exercise.id, exercise]));
