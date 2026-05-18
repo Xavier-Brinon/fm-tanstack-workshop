@@ -1,10 +1,6 @@
-import { asc } from "drizzle-orm";
-
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
-import { getDb } from "@/data/db";
-import { users as usersTable } from "@/drizzle/schema";
 import { RscLayout } from "@/components/rsc-layout/layout";
 import type { FC, PropsWithChildren } from "react";
 
@@ -20,18 +16,6 @@ const getLayout = createServerFn({
     <RscLayout>{props.children}</RscLayout>
   ));
 });
-
-export const getUserServerFn = createServerFn({ method: "GET" }).handler(
-  async () => {
-    const db = await getDb();
-    const [user] = await db
-      .select()
-      .from(usersTable)
-      .orderBy(asc(usersTable.id))
-      .limit(1);
-    return user ?? null;
-  },
-);
 
 export const Route = createFileRoute("/rsc-demo")({
   component: RouteComponent,
