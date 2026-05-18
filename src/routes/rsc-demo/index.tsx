@@ -21,7 +21,7 @@ type InClassExercise = {
   name: string;
 };
 
-export const Route = createFileRoute("/lessons/16/workouts/")({
+export const Route = createFileRoute("/rsc-demo/")({
   component: RouteComponent,
   loader: async () => {
     const workoutsPayload = await getInClassWorkoutHistoryServerFn({
@@ -42,11 +42,11 @@ function RouteComponent() {
   const { workouts } = Route.useLoaderData();
   const { isFetching } = Route.useMatch();
 
-  const layoutRoute = getRouteApi("/lessons/16/workouts");
+  const layoutRoute = getRouteApi("/rsc-demo/");
   const { isFetching: isLayoutFetching } = layoutRoute.useMatch();
 
   const { exercises } = useLoaderData({
-    from: "/lessons/16/workouts",
+    from: "/rsc-demo",
   });
 
   const exerciseLookup = useMemo(() => {
@@ -91,7 +91,7 @@ const RenderWorkout: FC<{
         <span className="flex gap-2">
           <span>{workout.name}</span>
           <Link
-            to={`/lessons/16/workouts/$id`}
+            to={`/rsc-demo/$id`}
             params={{ id: String(workout.id) }}
             className="ml-auto"
             preload={false}
@@ -122,14 +122,7 @@ const RenderWorkout: FC<{
                 newName,
               },
             });
-            await router.invalidate({
-              filter: route => route.routeId === "/lessons/16/workouts/",
-            });
-            await router.invalidate({
-              filter: route =>
-                route.routeId === "/lessons/16/workouts/$id" &&
-                route.params.id === String(workout.id),
-            });
+            await router.invalidate();
           }}
         >
           Update name
@@ -187,9 +180,7 @@ const Exercise: FC<{
           });
           setSaving(false);
 
-          await router.invalidate({
-            filter: route => route.routeId === "/lessons/16/workouts",
-          });
+          await router.invalidate();
         }}
       >
         Update exercise

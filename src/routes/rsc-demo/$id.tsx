@@ -4,7 +4,7 @@ import { getInClassWorkoutById } from "@/server-functions/in-class/workouts-simp
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/lessons/16/workouts/$id")({
+export const Route = createFileRoute("/rsc-demo/$id")({
   component: RouteComponent,
   loader: async ({ params }) => {
     const workout = await getInClassWorkoutById({
@@ -25,7 +25,7 @@ function RouteComponent() {
   const { workout } = Route.useLoaderData();
   const { isFetching } = Route.useMatch();
 
-  const routeApi = getRouteApi("/lessons/16/workouts");
+  const routeApi = getRouteApi("/rsc-demo");
   const { exercises } = routeApi.useLoaderData();
 
   const exerciseLookup = useMemo(() => {
@@ -44,7 +44,7 @@ function RouteComponent() {
       </span>
       <div className="flex">
         <h1 className="text-lg">{workout.name}</h1>
-        <Link to="/lessons/16/workouts" className="ml-auto" preload={false}>
+        <Link to="/rsc-demo" className="ml-auto" preload={false}>
           Back
         </Link>
       </div>
