@@ -190,7 +190,7 @@ export const getWorkouts = async (
         workoutSegmentExerciseId: row.exerciseRowId,
         setOrder: row.measurementSetOrder,
         reps: row.measurementReps,
-        weightUsed: formatNumericForDisplay(row.measurementWeightUsed),
+        weightUsed: formatNumericForDisplay(row.measurementWeightUsed) as any,
         duration: row.measurementDuration,
         distance: row.measurementDistance,
       });
