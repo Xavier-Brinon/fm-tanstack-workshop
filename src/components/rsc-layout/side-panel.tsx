@@ -6,19 +6,20 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-
-const AVATAR_URL = "https://d193qjyckdxivp.cloudfront.net/avatar.jpg";
+import type { FC } from "react";
+import type { UserInfo as UserInfoType } from "./types";
 
 const triggerClassName =
   "flex cursor-pointer items-center gap-3 rounded-xl text-left ring-1 ring-white/25 backdrop-blur-sm transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60";
 
-export function SidePanel() {
+export const SidePanel: FC<{ user: UserInfoType }> = ({ user }) => {
+  const { name, avatar } = user;
   return (
     <Sheet>
       <SheetTrigger type="button" className={triggerClassName}>
         <div className="flex items-center gap-3 h-[52px] w-36 rounded-xl bg-black/15 px-3 py-2 ring-1 ring-white/25 backdrop-blur-sm">
           <img
-            src={AVATAR_URL}
+            src={avatar}
             alt=""
             width={32}
             height={32}
@@ -29,7 +30,7 @@ export function SidePanel() {
             <p className="truncate text-xs font-semibold uppercase tracking-wide text-emerald-100/80">
               Signed in
             </p>
-            <p className="truncate text-sm font-semibold text-white">Adam</p>
+            <p className="truncate text-sm font-semibold text-white">{name}</p>
           </div>
         </div>
       </SheetTrigger>
@@ -43,4 +44,4 @@ export function SidePanel() {
       </SheetContent>
     </Sheet>
   );
-}
+};
