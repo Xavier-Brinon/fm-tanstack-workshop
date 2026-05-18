@@ -2,8 +2,8 @@ import {
   pgEnum,
   pgTable,
   integer,
-  timestamp,
   varchar,
+  timestamp,
   text,
   date,
   numeric,
@@ -132,6 +132,12 @@ export const networkTimingLog = pgTable(
     ),
   ],
 );
+
+export const users = pgTable("users", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  name: varchar({ length: 50 }).notNull(),
+  avatar: varchar({ length: 250 }),
+});
 
 export const workout = pgTable(
   "workout",
