@@ -1,8 +1,6 @@
 import type { ReactNode } from "react";
 import { UserInfo } from "./user-info";
 
-const AVATAR_URL = "https://d193qjyckdxivp.cloudfront.net/avatar.jpg";
-
 type RscLayoutProps = {
   children: ReactNode;
 };

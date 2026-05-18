@@ -7,7 +7,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import type { FC } from "react";
-import type { UserInfo as UserInfoType } from "./types";
+import type { UserInfoType } from "./types";
 
 const triggerClassName =
   "flex cursor-pointer items-center gap-3 rounded-xl text-left ring-1 ring-white/25 backdrop-blur-sm transition-opacity hover:opacity-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60";
