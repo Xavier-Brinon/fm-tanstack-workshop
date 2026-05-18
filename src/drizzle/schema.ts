@@ -136,7 +136,7 @@ export const networkTimingLog = pgTable(
 export const users = pgTable("users", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 50 }).notNull(),
-  avatar: varchar({ length: 250 }),
+  avatar: varchar({ length: 250 }).notNull(),
 });
 
 export const workout = pgTable(
