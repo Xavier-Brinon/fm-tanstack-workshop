@@ -19,7 +19,8 @@ type LessonKey =
   | "12"
   | "13"
   | "14"
-  | "15";
+  | "15"
+  | "16";
 const lessonSummaryHeading: { [key in LessonKey]: string } = {
   1: "Routing",
   2: "Loaders",
@@ -36,6 +37,7 @@ const lessonSummaryHeading: { [key in LessonKey]: string } = {
   13: "Advanced Middleware",
   14: "API Routes",
   15: "Selective Hydration",
+  16: "RSC",
 };
 
 type PageledLessonKey = "11";
@@ -91,7 +93,7 @@ function RouteComponent() {
           href="https://github.com/arackaf/tanstack-blog-blog-post"
           className="rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 transition hover:border-slate-400 hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-400 dark:hover:bg-slate-800"
         >
-          Lesson 16 - Static Pre-rendering
+          Lesson 17 - Static Pre-rendering
         </a>
       </div>
     </div>
