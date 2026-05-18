@@ -1,6 +1,7 @@
 export const UserInfo = async () => {
   const name = "Adam";
   const avatar = "https://d193qjyckdxivp.cloudfront.net/avatar.jpg";
+
   return (
     <div className="flex items-center gap-3 rounded-xl bg-black/15 px-3 py-2 ring-1 ring-white/25 backdrop-blur-sm">
       <img
