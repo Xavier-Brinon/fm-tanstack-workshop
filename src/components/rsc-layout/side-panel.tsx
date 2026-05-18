@@ -16,7 +16,7 @@ export function SidePanel() {
   return (
     <Sheet>
       <SheetTrigger type="button" className={triggerClassName}>
-        <div className="flex items-center gap-3 rounded-xl bg-black/15 px-3 py-2 ring-1 ring-white/25 backdrop-blur-sm">
+        <div className="flex items-center gap-3 h-[52px] w-36 rounded-xl bg-black/15 px-3 py-2 ring-1 ring-white/25 backdrop-blur-sm">
           <img
             src={AVATAR_URL}
             alt=""
