@@ -12,13 +12,17 @@ import {
   createCompositeComponent,
   CompositeComponent,
 } from "@tanstack/react-start/rsc";
+import type { UserInfoType } from "@/components/rsc-layout/types";
+import { SidePanel } from "@/components/rsc-layout/side-panel";
 
 const getLayout = createServerFn({
   method: "GET",
 }).handler(async () => {
-  return createCompositeComponent((props: PropsWithChildren) => (
-    <RscLayout>{props.children}</RscLayout>
-  ));
+  return createCompositeComponent(
+    (props: PropsWithChildren<{ UserContent: FC<{ user: UserInfoType }> }>) => (
+      <RscLayout UserContent={props.UserContent}>{props.children}</RscLayout>
+    ),
+  );
 });
 
 export const getUserServerFn = createServerFn({ method: "GET" }).handler(
@@ -49,7 +53,7 @@ export const Route = createFileRoute("/rsc-demo")({
 function RouteComponent() {
   const { layout } = Route.useLoaderData();
   return (
-    <CompositeComponent src={layout}>
+    <CompositeComponent src={layout} UserContent={SidePanel}>
       <div className="mx-auto w-full max-w-xl rounded-xl border border-slate-200 p-6 shadow-sm">
         <Outlet />
       </div>
