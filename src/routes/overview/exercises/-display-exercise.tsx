@@ -12,7 +12,6 @@ const executionLabels: Record<ExerciseRow["executionType"], string> = {
 
 type DisplayExerciseProps = {
   exercise: ExerciseRow | undefined | null;
-  /** When provided, muscle group IDs are shown as names instead of bare numbers. */
   muscleGroups?: MuscleGroup[];
 };
 
