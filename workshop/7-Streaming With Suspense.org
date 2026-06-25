@@ -1,7 +1,8 @@
-# Streaming
+#+title: Streaming with Suspense
+#+startup: indent
+#+options: ^:{}
 
-## Objectives
-
+* Objectives
 - Stream data with Suspense
 
 Don't manually resolve promises - use native React features
