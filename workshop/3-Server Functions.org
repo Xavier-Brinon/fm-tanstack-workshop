@@ -1,31 +1,35 @@
-# Server Functions
+#+title: Server Functions
+#+startup: indent
+#+options: ^:{}
 
-Docs: [https://tanstack.com/start/latest/docs/framework/react/guide/server-functions](https://tanstack.com/start/latest/docs/framework/react/guide/server-functions)
+Docs: [[https://tanstack.com/start/latest/docs/framework/react/guide/server-functions][server functions docs]]
 
-## Objectives
-
+* Objectives
 - Create a server function
 - Call it from the server
 - Call it from the browser
   - Note the differences (... there are none 😬)
 
-Loaders run on the server (on initial page load), and in the browser thereafter. That will often make them an invalid location to load data, since you won't be able to connect to a database, access sensitive connection strings or api keys, etc.
+Loaders run on the server (on initial page load), and in the browser
+thereafter. That will often make them an invalid location to load data,
+since you won't be able to connect to a database, access sensitive
+connection strings or api keys, etc.
 
-Server functions are the solution. You can **call** them from anywhere, but they will **always** run on the server.
+Server functions are the solution. You can *call* them from anywhere,
+but they will *always* run on the server.
 
-## Creating a server function
-
-```ts
+* Creating a server function
+#+begin_src javascript
 const getExercisesServerFn = createServerFn({ method: "GET" }).handler(
   async () => {
     return getExercises();
   },
 );
-```
+#+end_src
 
 Or with arguments
 
-```ts
+#+begin_src javascript
 const getWorkoutHistory = createServerFn({ method: "GET" })
   .inputValidator((input: WorkoutHistoryInput) => input)
   .handler(async ({ data }) => {
@@ -37,14 +41,14 @@ const getWorkoutHistory = createServerFn({ method: "GET" })
       ...payload,
     };
   });
-```
+#+end_src
 
-Naturally you don't have to use `GET`
+Naturally you don't have to use ~GET~
 
-```ts
+#+begin_src javascript
 export const updateWorkout = createServerFn({ method: "POST" })
   .inputValidator((input: WorkoutState) => input)
   .handler(async ({ data }) => {
     await updateWorkoutData(data);
   });
-```
+#+end_src
