@@ -1,0 +1,15 @@
+# Project toolchain — pinned to concrete versions so every machine and CI
+# resolves the SAME tools. This is the reproducible counterpart to the global
+# ~/.config/mise/config.toml (which uses "latest").
+#
+#   mise install            -> materialise exactly these versions
+#   mise use node@latest    -> bump a pin and rewrite this file
+#   mise current            -> show what's active in this directory
+[tools]
+node = "26.3.1" # current Node line
+aube = "1.25.0" # jdx's Rust package manager: aube / aubr / aubx
+
+# Auto-load project env (e.g. POSTGRES=...) into the shell on `cd`.
+# mise reads .env so DB connection strings are present without manual `source`.
+[env]
+_.file = ".env"

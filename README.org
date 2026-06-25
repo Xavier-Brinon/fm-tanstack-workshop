@@ -1,0 +1,203 @@
+#+title: TanStack Jacked
+#+author: Frontend Masters / master.dev workshop
+#+date: [2026-06-25 Thu]
+#+options: ^:{} toc:2 num:nil
+#+startup: indent
+
+Welcome to *TanStack Jacked* — a full-stack workout tracker built on
+[[https://tanstack.com/start][TanStack Start]] (file-based routing, server
+functions, streaming, React Query) backed by Drizzle ORM and Postgres.
+
+This repository has been re-tooled away from the workshop defaults. The
+original instructions assumed *Docker Desktop* and *npm*; this copy uses
+*Podman* + *mise* + *aube* on an up-to-date dependency set. The full
+rationale is in [[#changes-from-upstream][Changes from the upstream workshop]].
+
+The upgraded stack is verified booting end-to-end: Vite 8 with the TanStack
+plugin chain, React 19 SSR, and Drizzle against Postgres 18.2 in Podman.
+
+* Toolchain
+| Concern           | Tool     | Notes                                            |
+|-------------------+----------+--------------------------------------------------|
+| Tool versions     | ~mise~   | Pins Node + aube in a project-local ~mise.toml~  |
+| Package manager   | ~aube~   | jdx's Rust PM — ~aube~ / ~aubr~ / ~aubx~         |
+| Container runtime | ~podman~ | Daemonless, rootless, Docker-compatible CLI      |
+| Database          | Postgres | Runs in a container on host port *5433*          |
+
+** Why this toolchain
+- mise :: Keeps the Node and ~aube~ versions reproducible and pinned in the
+  repo, instead of relying on whatever is globally installed.
+- aube :: Auto-installs dependencies when you run a script with ~aubr~, so
+  there is no separate "did you run ~npm install~?" step. ~aubx~ runs a
+  one-off tool (the ~npx~ equivalent).
+- podman :: A drop-in for Docker that needs no background daemon and runs
+  rootless. On macOS it runs through a lightweight ~podman machine~ VM.
+
+* Getting started
+** Prerequisites
+- [[https://mise.jdx.dev][mise]] installed and activated in your shell.
+- [[https://podman.io][podman]] with a running machine. On first use, run
+  ~podman machine init && podman machine start~.
+
+** 1. Install the toolchain
+#+begin_src shell
+mise trust      # approve this repo's mise.toml (one time)
+mise install    # materialise Node + aube at the pinned versions
+#+end_src
+
+~mise~ refuses to load a ~mise.toml~ it has not been told to trust, because
+that file can define environment variables and tasks. ~mise trust~ records a
+hash of the file; if its contents change, re-run ~mise trust~.
+
+** 2. Install dependencies
+#+begin_src shell
+aube install
+#+end_src
+
+You can usually skip this — ~aubr~ auto-installs stale dependencies before
+running a script.
+
+** 3. Start Postgres
+In one terminal:
+
+#+begin_src shell
+aubr pg        # persistent — data lives in =~/Documents/pg-data=
+# or
+aubr pg-raw    # ephemeral — fresh DB, lost when the container stops
+#+end_src
+
+The schema and seed data are created *automatically* on first access — see
+[[#db-bootstrap][How the database bootstraps itself]]. There is no manual
+migration step.
+
+** 4. Run the dev server
+In a second terminal:
+
+#+begin_src shell
+aubr dev
+#+end_src
+
+Because ~mise~ is active in your interactive shell, it injects ~POSTGRES~
+(from ~.env~) into the environment automatically. In a *non-interactive*
+shell (scripts, CI, agents) that activation hook does not fire, so wrap the
+command:
+
+#+begin_src shell
+mise exec -- aubr dev
+#+end_src
+
+The app serves on <http://localhost:3000> (or the next free port).
+
+* Building for production
+#+begin_src shell
+aubr build
+#+end_src
+
+* How the database bootstraps itself
+:PROPERTIES:
+:CUSTOM_ID: db-bootstrap
+:END:
+The app owns its own schema; you never run migrations by hand.
+
+1. ~src/data/db.ts~ picks the driver based on ~USE_PG_LITE~ in
+   ~src/APPLICATION-SETTINGS.ts~ (real Postgres by default).
+2. On the first DB access, ~run-setup.ts~ calls ~setupIfNeeded()~ — memoised
+   with lodash ~once~, so it runs exactly once per process.
+3. ~setupIfNeeded()~ connects to the maintenance ~postgres~ database, checks
+   ~pg_database~ for ~tanstack-jacked~, and if absent runs ~CREATE DATABASE~
+   followed by ~src/data/db-setup/setup.sql~ (tables, enums, seed data).
+4. ~getPgDb()~ then connects to ~tanstack-jacked~ and wraps the pool with
+   Drizzle.
+
+* Changes from the upstream workshop
+:PROPERTIES:
+:CUSTOM_ID: changes-from-upstream
+:END:
+These deviate from the original Frontend Masters / master.dev instructions.
+The pristine baseline is preserved on the ~main~ branch; this work lives on
+the ~tooling/mise-aube-podman-latest~ branch.
+
+** Container runtime: Docker to Podman
+The ~pg~ and ~pg-raw~ scripts now call ~podman container run~ instead of
+~docker container run~. Podman's CLI is Docker-compatible, so this is a near
+drop-in. The host-path volume mount works because ~$HOME~ is shared into the
+~podman machine~ VM by default.
+
+** Tool versions: project-local mise.toml
+~mise.toml~ pins ~node = "26.3.1"~ and ~aube = "1.25.0"~ and loads ~.env~ via
+its ~[env]~ section. This makes the toolchain part of the repo's contract
+rather than depending on globally-installed ~latest~ versions.
+
+** Package manager: npm to aube
+The ~package.json~ scripts were ported to aube idioms:
+
+- ~db-pull~ uses ~aubx drizzle-kit pull~ (one-off tool runner, like ~npx~).
+- ~update-tanstack~ uses a single ~aube add ...@latest~ instead of chained
+  ~npm i~ calls.
+
+The stale npm ~package-lock.json~ was removed and regenerated by aube. This
+was *required*: aube performs a lockfile-faithful install, so it reproduced
+the old locked versions and ignored the bumped ranges until the lock was
+deleted.
+
+** Dependencies updated to latest
+All dependencies were bumped to latest (majors included) via
+~npm-check-updates~, then resolved with a fresh ~aube install~. Notable major
+bumps:
+
+| Package              | Before | After |
+|----------------------+--------+-------|
+| vite                 | 7.x    | 8.x   |
+| typescript           | 5.7    | 6.0   |
+| vitest               | 3.x    | 4.x   |
+| @vitejs/plugin-react | 5.x    | 6.x   |
+| @types/node          | 22.x   | 26.x  |
+| jsdom                | 27.x   | 29.x  |
+| shadcn (CLI)         | 3.x    | 4.x   |
+| lucide-react         | 0.545  | 1.x   |
+| react-day-picker     | 9.x    | 10.x  |
+
+Two dependencies are deliberately held back:
+
+- ~drizzle-orm~ / ~drizzle-kit~ remain on their ~1.0.0-beta~ pin — the entire
+  data layer is written against that exact beta, and drizzle's pre-1.0 APIs
+  shift between releases.
+- ~nitro~ stays on its ~npm:nitro-nightly@latest~ alias, which self-updates
+  on every install.
+
+** Database port: 5432 to 5433
+The container publishes host port *5433* (~-p 5433:5432~) to avoid colliding
+with another Postgres already bound to 5432 on this machine. Three references
+were updated together: the ~pg~ and ~pg-raw~ scripts, ~.env~, and
+~drizzle.config.ts~.
+
+** tsconfig: removed deprecated baseUrl
+TypeScript 6.0 reports ~baseUrl~ as a deprecated option (error TS5101).
+Because the ~paths~ values are already relative (~./src/*~), ~baseUrl~ was
+removed entirely — modern TypeScript resolves ~paths~ relative to the config
+file's own directory.
+
+* Known issues / backlog
+These do *not* block the dev server (Vite and esbuild transpile without
+type-checking), but are worth tracking:
+
+- Pre-existing tsc errors :: In the data layer, the ~distance~ and ~duration~
+  numeric columns are typed as ~number~ in the generated
+  ~src/drizzle/schema.ts~ but built as ~string~ in
+  ~src/data/workouts/insert-workout.ts~ and ~update-workout.ts~; plus an
+  unused parameter in the generated schema. Surfaced the first time anyone
+  ran ~tsc~ on the project.
+- inputValidator deprecation :: ~createServerFn().inputValidator()~ is
+  deprecated in the upgraded ~@tanstack/react-start~; use ~validator()~. It
+  appears across ~src/server-functions/*~ and lesson routes.
+- PGlite eager init :: ~@electric-sql/pglite@0.5~ throws "failed to
+  initialize" at import time even when ~USE_PG_LITE = false~. The error is
+  swallowed (PGlite is unused on the real-Postgres path), but it signals an
+  import side-effect in ~src/data/db.ts~.
+- Redundant plugin :: Vite 8 resolves tsconfig paths natively
+  (~resolve.tsconfigPaths: true~), so ~vite-tsconfig-paths~ can be dropped.
+
+* Bring your own database
+Point ~POSTGRES~ in ~.env~ at any Postgres instance
+(~postgresql://user:pass@host:port~). The app appends ~/tanstack-jacked~ and
+bootstraps the schema on first run, so an empty database is enough.
