@@ -17,12 +17,12 @@ The upgraded stack is verified booting end-to-end: Vite 8 with the TanStack
 plugin chain, React 19 SSR, and Drizzle against Postgres 18.2 in Podman.
 
 * Toolchain
-| Concern           | Tool     | Notes                                            |
-|-------------------+----------+--------------------------------------------------|
-| Tool versions     | ~mise~   | Pins Node + aube in a project-local ~mise.toml~  |
-| Package manager   | ~aube~   | jdx's Rust PM — ~aube~ / ~aubr~ / ~aubx~         |
-| Container runtime | ~podman~ | Daemonless, rootless, Docker-compatible CLI      |
-| Database          | Postgres | Runs in a container on host port *5433*          |
+| Concern           | Tool     | Notes                                       |
+|-------------------+----------+---------------------------------------------|
+| Tool versions     | ~mise~   | Pins Node, aube + dotenvx in ~mise.toml~    |
+| Package manager   | ~aube~   | jdx's Rust PM — ~aube~ / ~aubr~ / ~aubx~    |
+| Container runtime | ~podman~ | Daemonless, rootless, Docker-compatible CLI |
+| Database          | Postgres | Runs in a container on host port *5433*     |
 
 ** Why this toolchain
 - mise :: Keeps the Node and ~aube~ versions reproducible and pinned in the
@@ -48,7 +48,7 @@ changes — see [[file:CONTRIBUTING.org][CONTRIBUTING.org]].
 ** 1. Install the toolchain
 #+begin_src shell
 mise trust      # approve this repo's mise.toml (one time)
-mise install    # materialise Node + aube at the pinned versions
+mise install    # materialise Node, aube + dotenvx at the pinned versions
 #+end_src
 
 ~mise~ refuses to load a ~mise.toml~ it has not been told to trust, because that
@@ -116,8 +116,8 @@ The app owns its own schema; you never run migrations by hand.
 :CUSTOM_ID: changes-from-upstream
 :END:
 These deviate from the original Frontend Masters / master.dev instructions. The
-pristine baseline is preserved on the ~main~ branch; this work lives on the
-~tooling/mise-aube-podman-latest~ branch.
+pristine baseline is preserved in history at commit ~659955a~; everything below
+is merged into ~main~ (via the ~tooling/*~ branches and Radicle patches).
 
 ** Container runtime: Docker to Podman
 The ~pg~ and ~pg-raw~ scripts now call ~podman container run~ instead of ~docker
@@ -158,15 +158,15 @@ bumps:
 
 | Package              | Before | After |
 |----------------------+--------+-------|
-| vite                 | 7.x    | 8.x   |
-| typescript           | 5.7    | 6.0   |
-| vitest               | 3.x    | 4.x   |
-| @vitejs/plugin-react | 5.x    | 6.x   |
-| @types/node          | 22.x   | 26.x  |
-| jsdom                | 27.x   | 29.x  |
-| shadcn (CLI)         | 3.x    | 4.x   |
-| lucide-react         | 0.545  | 1.x   |
-| react-day-picker     | 9.x    | 10.x  |
+| vite                 |    7.x |   8.x |
+| typescript           |    5.7 |   6.0 |
+| vitest               |    3.x |   4.x |
+| @vitejs/plugin-react |    5.x |   6.x |
+| @types/node          |   22.x |  26.x |
+| jsdom                |   27.x |  29.x |
+| shadcn (CLI)         |    3.x |   4.x |
+| lucide-react         |  0.545 |   1.x |
+| react-day-picker     |    9.x |  10.x |
 
 Two dependencies are deliberately held back:
 
@@ -212,6 +212,7 @@ type-checking), but are worth tracking:
   (~resolve.tsconfigPaths: true~), so ~vite-tsconfig-paths~ can be dropped.
 
 * Bring your own database
-Point ~POSTGRES~ in ~.env~ at any Postgres instance
-(~postgresql://user:pass@host:port~). The app appends ~/tanstack-jacked~ and
-bootstraps the schema on first run, so an empty database is enough.
+Set ~POSTGRES~ to any Postgres instance with ~dotenvx set POSTGRES
+"postgresql://user:pass@host:port"~ (it re-encrypts ~.env~ in place). The app
+appends ~/tanstack-jacked~ and bootstraps the schema on first run, so an empty
+database is enough.

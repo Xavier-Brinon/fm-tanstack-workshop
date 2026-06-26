@@ -71,23 +71,34 @@ See
 * Environment variables
 The app reads ~POSTGRES~ from ~.env~, which is *encrypted* with dotenvx. The
 env-needing scripts (~dev~, ~build~, ~preview~, ~test~) run through ~dotenvx
-run~, which decrypts ~.env~ and injects the values — so they behave the same in
-any shell, interactive or not.
+run~, which decrypts ~.env~ with the private key and injects the values — so
+they behave the same in any shell, interactive or not. The public key lives in
+~.env~ (committed) and only *encrypts*; the private key in ~.env.keys~
+(gitignored) is the only thing that can *decrypt*.
 
-Decryption needs the private key in ~.env.keys~ (gitignored, never committed).
-On a fresh clone, obtain it from a teammate or pass it inline:
+** dotenvx cheat-sheet
+- View a value :: ~dotenvx get POSTGRES~ decrypts and prints one variable.
+- Set or add a value :: ~dotenvx set POSTGRES "postgresql://…"~ encrypts it in
+  place; the same command adds a brand-new key.
+- Run with env :: ~dotenvx run -- <cmd>~, e.g. ~dotenvx run -- psql~.
+- List env files :: ~dotenvx ls~.
+- Show the keys :: ~dotenvx keypair~ prints the public and private keys.
+- Rotate the keypair :: ~dotenvx rotate~ generates a fresh keypair and
+  re-encrypts ~.env~ — do this if ~.env.keys~ ever leaks, then re-share the key.
+
+** Onboarding and sharing the key
+~.env.keys~ is never committed, so a fresh clone cannot decrypt ~.env~ until it
+has the private key. Get it from a teammate over a secure channel — a secrets
+manager or password vault, not git or chat — then put it in ~.env.keys~ or pass
+it inline:
 
 #+begin_src shell
   DOTENV_PRIVATE_KEY=<key> aubr dev
 #+end_src
 
-To change a value (dotenvx re-encrypts in place):
-
-#+begin_src shell
-  dotenvx set POSTGRES "postgresql://user:pass@host:5433"
-#+end_src
-
-For any ad-hoc command that needs env, wrap it: ~dotenvx run -- <cmd>~.
+To hand the key to a teammate, send them the ~DOTENV_PRIVATE_KEY~ line from your
+~.env.keys~ the same secure way. Optionally run ~dotenvx precommit~ once to
+install a guard that blocks committing a plaintext ~.env~ or the keys.
 
 * Common tasks
 - ~aubr dev~ :: start the dev server.
