@@ -1,0 +1,119 @@
+#+title: Contributing
+#+author: Frontend Masters / master.dev workshop
+#+date: [2026-06-25 Thu]
+#+options: ^:{} toc:2 num:nil
+#+startup: indent
+
+How to run the app locally and submit changes. For the project overview and the
+rationale behind the toolchain, see [[file:README.org][README.org]].
+
+* Prerequisites
+- mise :: Tool-version manager. Install from <https://mise.jdx.dev> and activate
+  it in your shell.
+- podman :: Container runtime. Needs a running machine — on first use run
+  ~podman machine init && podman machine start~.
+
+* Bootstrap the toolchain
+Pin and install the exact Node, aube, and dotenvx versions declared in
+~mise.toml~:
+
+#+begin_src shell
+  mise trust      # approve this repo's mise.toml (one time)
+  mise install    # install Node, aube + dotenvx at the pinned versions
+#+end_src
+
+~mise~ refuses to load a ~mise.toml~ it has not been told to trust; ~mise trust~
+records a hash of the file, so re-run it if the file changes.
+
+* Run the app
+The app needs two long-running processes:
+- a Postgres container
+- the dev server.
+
+Use two terminals.
+
+** Terminal 1 — Postgres
+#+begin_src shell
+  aubr pg        # persistent — data lives in =~/Documents/pg-data=
+  # or
+  aubr pg-raw    # ephemeral — fresh DB, lost when the container stops
+#+end_src
+
+** Terminal 2 — dev server
+#+begin_src shell
+  aubr dev
+#+end_src
+
+~aubr~ auto-installs dependencies if they are stale, so there is no separate
+install step. The app serves on <http://localhost:3000>; if that port is taken
+it falls back to the next free one (e.g. 3001) — read the Vite banner for the
+actual URL.
+
+* Ports
+- Postgres :: published on host port *5433* (relocated from the default 5432 to
+  avoid colliding with another local Postgres). The container still listens on
+  5432 internally.
+- Dev server :: 3000, falling back to the next free port if occupied.
+
+* Database
+** Persistent vs ephemeral
+- ~aubr pg~ :: persists data under =~/Documents/pg-data=.
+- ~aubr pg-raw~ :: ephemeral; the database is recreated on every start.
+- ~aubr pg-clear~ :: delete the persistent data directory for a clean slate.
+
+** First-run bootstrap
+On the first database access the app creates the ~tanstack-jacked~ database and
+runs ~src/data/db-setup/setup.sql~ (schema + seed). There is no manual migration
+step.
+See
+[[file:README.org::*How the database bootstraps itself][README.org: How the database bootstraps itself]].
+
+* Environment variables
+The app reads ~POSTGRES~ from ~.env~, which is *encrypted* with dotenvx. The
+env-needing scripts (~dev~, ~build~, ~preview~, ~test~) run through ~dotenvx
+run~, which decrypts ~.env~ and injects the values — so they behave the same in
+any shell, interactive or not.
+
+Decryption needs the private key in ~.env.keys~ (gitignored, never committed).
+On a fresh clone, obtain it from a teammate or pass it inline:
+
+#+begin_src shell
+  DOTENV_PRIVATE_KEY=<key> aubr dev
+#+end_src
+
+To change a value (dotenvx re-encrypts in place):
+
+#+begin_src shell
+  dotenvx set POSTGRES "postgresql://user:pass@host:5433"
+#+end_src
+
+For any ad-hoc command that needs env, wrap it: ~dotenvx run -- <cmd>~.
+
+* Common tasks
+- ~aubr dev~ :: start the dev server.
+- ~aubr build~ :: production build.
+- ~aube run test~ :: run the Vitest suite.
+- ~aube run tsc~ :: type-check the project (no emit).
+- ~aubr db-pull~ :: regenerate the Drizzle schema from the live database.
+
+* Troubleshooting
+- Postgres will not start / port in use :: Another Postgres may hold the port.
+  Ours uses 5433; check ~podman ps~ and stop a stale container with ~podman stop
+  <id>~.
+- "POSTGRES environment variable is required" :: the env was not injected. Run
+  the app via the wrapped scripts (~aubr dev~ uses ~dotenvx run~), and make sure
+  ~.env.keys~ is present so dotenvx can decrypt ~.env~.
+- Dev server on an unexpected port :: 3000 was occupied; read the Vite banner
+  for the real URL.
+- mise refuses to load ~mise.toml~ :: run ~mise trust~ once.
+- "PGlite failed to initialize" in the logs :: harmless on the real-Postgres
+  path (~USE_PG_LITE~ is false); it is an unused eager import.
+
+* Submitting changes
+- Review-gated work :: commit on a topic branch, then publish a Radicle patch
+  with ~git push rad HEAD:refs/patches~ (a human runs the push and authors the
+  message in the editor). Merge with ~git merge patch/<id>~ then ~git push rad
+  main~.
+- Docs / trivial changes :: may go direct to ~main~.
+- Org docs :: follow the org style guide; ~org-review~ fills prose to
+  ~fill-column~ 80 and never splits links.

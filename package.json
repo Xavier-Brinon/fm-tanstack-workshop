@@ -6,10 +6,10 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "vite dev --port 3000",
-    "build": "vite build",
-    "preview": "vite preview",
-    "test": "vitest run",
+    "dev": "dotenvx run --quiet -- vite dev --port 3000",
+    "build": "dotenvx run --quiet -- vite build",
+    "preview": "dotenvx run --quiet -- vite preview",
+    "test": "dotenvx run --quiet -- vitest run",
     "pg": "podman container run -e POSTGRES_USER=docker -e POSTGRES_PASSWORD=docker -p 5433:5432 -v ~/Documents/pg-data:/var/lib/postgresql postgres:18.2-alpine3.23",
     "pg-raw": "podman container run -e POSTGRES_USER=docker -e POSTGRES_PASSWORD=docker -p 5433:5432 postgres:18.2-alpine3.23",
     "pg-clear": "rm -rf ~/Documents/pg-data",
@@ -33,7 +33,6 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.4.0",
-    "dotenv": "^17.4.2",
     "drizzle-kit": "^1.0.0-beta.15-859cf75",
     "drizzle-orm": "^1.0.0-beta.15-859cf75",
     "framer-motion": "^12.42.0",

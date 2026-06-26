@@ -6,10 +6,10 @@
 #   mise use node@latest    -> bump a pin and rewrite this file
 #   mise current            -> show what's active in this directory
 [tools]
-node = "26.3.1" # current Node line
-aube = "1.25.0" # jdx's Rust package manager: aube / aubr / aubx
+node = "26.3.1"    # current Node line
+aube = "1.25.0"    # jdx's Rust package manager: aube / aubr / aubx
+dotenvx = "1.75.1" # encrypted .env loader: `dotenvx run -- <cmd>` decrypts + injects
 
-# Auto-load project env (e.g. POSTGRES=...) into the shell on `cd`.
-# mise reads .env so DB connection strings are present without manual `source`.
-[env]
-_.file = ".env"
+# Env is loaded by dotenvx (see the `dotenvx run` wrappers in package.json),
+# NOT by mise. With an encrypted .env, a mise `[env] _.file = ".env"` would
+# inject the ciphertext verbatim, so it is intentionally absent.

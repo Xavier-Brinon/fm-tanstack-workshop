@@ -1,12 +1,7 @@
 import once from "lodash/once";
-import dotenv from "dotenv";
-
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { setupIfNeeded } from "./execute-setup-ddl";
 
-const thisFileDir = dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: join(thisFileDir, "../../.env") });
-
+// Env (POSTGRES) is injected by `dotenvx run` from the package.json scripts;
+// no in-app .env loading needed.
 export const setUp = once(() => setupIfNeeded());

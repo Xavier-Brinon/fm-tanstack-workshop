@@ -10,8 +10,8 @@ functions, streaming, React Query) backed by Drizzle ORM and Postgres.
 
 This repository has been re-tooled away from the workshop defaults. The original
 instructions assumed *Docker Desktop* and *npm*; this copy uses *Podman* +
-*mise* + *aube* on an up-to-date dependency set. The full rationale is
-in [[#changes-from-upstream][Changes from the upstream workshop]].
+*mise* + *aube* + *dotenvx* on an up-to-date dependency set. The full rationale
+is in [[#changes-from-upstream][Changes from the upstream workshop]].
 
 The upgraded stack is verified booting end-to-end: Vite 8 with the TanStack
 plugin chain, React 19 SSR, and Drizzle against Postgres 18.2 in Podman.
@@ -32,8 +32,14 @@ plugin chain, React 19 SSR, and Drizzle against Postgres 18.2 in Podman.
   (the ~npx~ equivalent).
 - podman :: A drop-in for Docker that needs no background daemon and runs
   rootless. On macOS it runs through a lightweight ~podman machine~ VM.
+- dotenvx :: Loads ~.env~ into a command's environment via ~dotenvx run -- …~
+  and keeps the committed ~.env~ encrypted; the private key lives in the
+  gitignored ~.env.keys~.
 
 * Getting started
+For the full local-development guide — ports, troubleshooting, and submitting
+changes — see [[file:CONTRIBUTING.org][CONTRIBUTING.org]].
+
 ** Prerequisites
 - [[https://mise.jdx.dev][mise]] installed and activated in your shell.
 - [[https://podman.io][podman]] with a running machine. On first use, run
@@ -77,13 +83,10 @@ In a second terminal:
 aubr dev
 #+end_src
 
-Because ~mise~ is active in your interactive shell, it injects ~POSTGRES~ (from
-~.env~) into the environment automatically. In a *non-interactive* shell
-(scripts, CI, agents) that activation hook does not fire, so wrap the command:
-
-#+begin_src shell
-mise exec -- aubr dev
-#+end_src
+The ~dev~ script runs through ~dotenvx run~, which decrypts ~.env~ and injects
+~POSTGRES~ — so ~aubr dev~ behaves identically in any shell (interactive, CI, or
+agent); no ~mise exec~ wrapper is needed. Decryption needs the private key in
+~.env.keys~ (gitignored), so make sure that file is present locally.
 
 The app serves on <http://localhost:3000> (or the next free port).
 
@@ -123,9 +126,19 @@ The host-path volume mount works because ~$HOME~ is shared into the ~podman
 machine~ VM by default.
 
 ** Tool versions: project-local mise.toml
-~mise.toml~ pins ~node = "26.3.1"~ and ~aube = "1.25.0"~ and loads ~.env~ via
-its ~[env]~ section. This makes the toolchain part of the repo's contract rather
-than depending on globally-installed ~latest~ versions.
+~mise.toml~ pins ~node = "26.3.1"~, ~aube = "1.25.0"~, and ~dotenvx = "1.75.1"~.
+This makes the toolchain part of the repo's contract rather than depending on
+globally-installed ~latest~ versions. Env loading is delegated to dotenvx (see
+below), not a mise ~[env]~ block — an encrypted ~.env~ must be decrypted at run
+time, which mise cannot do.
+
+** Encrypted env with dotenvx
+~dotenvx~ is pinned in ~mise.toml~ and the env-needing scripts (~dev~, ~build~,
+~preview~, ~test~) are wrapped with ~dotenvx run --quiet -- …~, so ~POSTGRES~ is
+injected in any shell. ~.env~ is encrypted with ~dotenvx encrypt~: the public
+key and ciphertext are committed, while the private key in ~.env.keys~ is
+gitignored. The dead ~dotenv~ dependency — its ~dotenv.config~ pointed at a
+nonexistent path — was removed from both ~run-setup.ts~ files.
 
 ** Package manager: npm to aube
 The ~package.json~ scripts were ported to aube idioms:
@@ -179,11 +192,15 @@ directory.
 These do *not* block the dev server (Vite and esbuild transpile without
 type-checking), but are worth tracking:
 
-- Pre-existing tsc errors :: In the data layer, the ~distance~ and ~duration~
-  numeric columns are typed as ~number~ in the generated ~src/drizzle/schema.ts~
-  but built as ~string~ in ~src/data/workouts/insert-workout.ts~ and
-  ~update-workout.ts~; plus an unused parameter in the generated schema.
-  Surfaced the first time anyone ran ~tsc~ on the project.
+- Pre-existing tsc errors :: ~aube run tsc~ reports ~22 errors (none block the
+  dev server — Vite transpiles without type-checking). They come from the major
+  upgrades, not the app's logic: ~react-day-picker~ 10 changed the calendar
+  ~ClassNames~ API (~ui/calendar.tsx~); the ~drizzle~ beta typings don't line up
+  with ~drizzle()~ / ~DbType~ (~get-pg-db~, ~get-pg-lite-db~, ~db.ts~,
+  ~types.ts~); and numeric columns (~distance~ / ~duration~) are ~string~ where
+  a ~number~ is expected, across the workout-template forms and ~insert~ /
+  ~update~ data functions; plus one unused parameter in the generated
+  ~src/drizzle/schema.ts~.
 - inputValidator deprecation :: ~createServerFn().inputValidator()~ is
   deprecated in the upgraded ~@tanstack/react-start~; use ~validator()~. It
   appears across ~src/server-functions/*~ and lesson routes.

@@ -10,3 +10,6 @@ dist-ssr
 .vinxi
 __unconfig*
 todos.json
+
+# dotenvx private key — never commit (it decrypts the .env values)
+.env.keys
